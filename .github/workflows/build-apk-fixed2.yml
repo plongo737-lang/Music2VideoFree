@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Unzip project
-        run: unzip "M2V_refonte_corrigee.zip"
+        run: unzip run: unzip "M2V_refonte_studio_v2.zip"
       
 
       - name: Fix Java errors
