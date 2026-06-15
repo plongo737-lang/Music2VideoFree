@@ -1,0 +1,63 @@
+name: Build APK FIXED 2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip project
+        run: unzip "M2V (1).zip"
+
+      - name: Fix Java errors
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          lyrics = Path("music2video_android_cost_safe_studio/app/src/main/java/com/entilio/music2videofree/LyricsEngine.java")
+          s = lyrics.read_text()
+          s = s.replace("\\-", "-")
+          lyrics.write_text(s)
+
+          main = Path("music2video_android_cost_safe_studio/app/src/main/java/com/entilio/music2videofree/MainActivity.java")
+          s = main.read_text()
+          s = s.replace(
+              "VideoCorrector.correct(MainActivity.this, videoToCorrectUri, audioForCorrection, options, new UiProgress())",
+              "VideoCorrector.correct(MainActivity.this, videoToCorrectUri, audioForCorrection, imageUris, options, new UiProgress())"
+          )
+          main.write_text(s)
+
+          print("Corrections Java appliquées")
+          PY
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.10.2
+
+      - name: Build APK
+        working-directory: music2video_android_cost_safe_studio
+        run: gradle assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Music2VideoFree-debug-apk
+          path: music2video_android_cost_safe_studio/app/build/outputs/apk/debug/*.apk
