@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Unzip project
-        run: unzip "M2V_v4_3_fixed.zip"
+        run: unzip "M2V_v4_3_fixed2.zip"
       
 
       - name: Fix Java errors
